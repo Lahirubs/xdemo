@@ -1,0 +1,3 @@
+<apex:page Controller="BlogLogPageController" showHeader="false" standardStylesheets="false" sidebar="false">
+ {!body}
+</apex:page>

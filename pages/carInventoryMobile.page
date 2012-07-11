@@ -1,0 +1,77 @@
+<apex:page controller="CarInventoryMobileController" showHeader="false" standardStylesheets="false" >
+    <head> 
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0b1/jquery.mobile-1.0b1.min.css"/>
+        <script src="http://code.jquery.com/jquery-1.6.1.min.js"></script>
+        <script src="http://code.jquery.com/mobile/1.0b1/jquery.mobile-1.0b1.min.js"></script>
+        <title>Car Inventory</title> 
+    </head> 
+    
+    <style>
+        .ui-block-b{
+            font-weight: normal;
+        }
+        .footer{
+            font-size: 10px;
+            text-align: center;
+            padding: 4px;
+        }
+    </style>
+    
+    <!-- MAIN PAGE -->
+    <div data-role="page" data-theme="b">
+        <div data-role="header" >
+            <h1>Car Inventory</h1>
+        </div>
+    
+        <div data-role="content">   
+            <ul data-role="listview" data-theme="g">
+                <apex:repeat value="{!cars}" var="c">
+                    <li><a href="#{!c.Id}">{!c.Brand__c} - {!c.Model__c}</a></li>
+                </apex:repeat>
+            </ul>      
+        </div>
+    
+        <div data-role="footer">
+            <div class="footer">Dreamforce 2011</div>
+        </div>
+    </div>
+    <!-- END MAIN PAGE -->
+
+    <!-- ACCOUNT DETAIL PAGES -->
+    <apex:repeat value="{!cars}" var="c">
+        <div data-role="page" data-theme="b" id="{!c.Id}">
+            <div data-role="header" >
+                <h1>{!c.Model__c}</h1>
+            </div>
+        
+            <div data-role="content">   
+                <ul data-role="listview" data-theme="d" data-inset="true">
+                    <li>
+                        <div class="ui-grid-a">
+                            <div class="ui-block-a">Brand</div>
+                            <div class="ui-block-b">{!c.Brand__c}</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="ui-grid-a">
+                            <div class="ui-block-a">VIN</div>
+                            <div class="ui-block-b">{!c.VIN__c}</div>
+                        </div>
+                    </li>
+                </ul>      
+            </div>
+        
+            <div data-role="footer">
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="b.html">Financing</a></li>
+                        <li><a href="a.html">Previous Sales</a></li>
+                        <li><a href="b.html">Maintainance</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </apex:repeat>
+</apex:page>

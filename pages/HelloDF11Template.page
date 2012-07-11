@@ -1,0 +1,10 @@
+<apex:page Controller="MyNewController">
+	<style>
+		.dateFormat { display: block; clear: all; }
+	
+	</style>
+	<apex:form >
+		<apex:commandButton value="Edit" action="{!customEdit}" />
+	</apex:form>
+
+</apex:page>

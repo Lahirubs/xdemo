@@ -1,0 +1,126 @@
+<apex:page controller="CarInventoryRemoteController" showHeader="false" standardStylesheets="false" cache="false" >
+    <head> 
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0b2/jquery.mobile-1.0b2.min.css" />
+        <script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
+        <script src="http://code.jquery.com/mobile/1.0b2/jquery.mobile-1.0b2.min.js"></script>
+        
+        <title>Car Inventory</title> 
+        
+        <script>
+            j$ = jQuery.noConflict();
+            
+            j$(document).ready(function() {
+                <!-- Calls Apex method in controller, handle response with showCars() method -->
+                CarInventoryRemoteController.getCars(showCars);
+            });
+            
+            function showCars(cars,message) {
+                j$('#carlist').empty();
+                
+                j$.each(cars, function(){
+                    j$('<li></li>')
+                    .attr('id',this.Id)
+                    .append('<a>'+this.Brand__c+' '+this.Model__c+'</a>')
+                    .click(function(e){
+                        e.preventDefault();
+                        j$.mobile.pageLoading();
+                        CarInventoryRemoteController.getCar(this.id,showCar); <!-- Calls Apex method in controller -->
+                    })
+                    .appendTo('#carlist');
+                });
+                
+                j$('#carlist').listview('refresh'); <!-- Resets jquery mobile styling and functionality -->
+            }
+            
+            function showCar(car,message) {
+                j$('#carHeader').html(car.Brand__c + ' ' +car.Model__c);
+                j$('#brandDiv').html(car.Brand__c);
+                j$('#vinDiv').html(car.VIN__c);
+                j$('#mileDiv').html(car.Mileage__c);
+                j$('#priceDiv').html(car.Price__c);
+                
+                j$.mobile.changePage('#carDetail',{
+                    transition: 'slide',
+                    reverse: false
+                });
+            }
+        </script>
+    </head> 
+    
+    <style>
+        .ui-block-b{
+            font-weight: normal;
+        }
+        .footer{
+            font-size: 10px;
+            text-align: center;
+            padding: 4px;
+        }
+    </style>
+    
+    <!-- MAIN LIST PAGE -->
+    <div data-role="page" data-theme="b" id="mainpage">
+        <div data-role="header" >
+            <h1>Car Inventory</h1>
+        </div>
+    
+        <div data-role="content">   
+            <ul data-role="listview" data-theme="c" id="carlist">
+            </ul>      
+        </div>
+    
+        <div data-role="footer">
+            <div class="footer">Dreamforce 2011</div>
+        </div>
+    </div>
+    <!-- END MAIN LIST PAGE -->
+
+    <!-- CAR DETAIL PAGES -->
+    <div data-role="page" data-theme="b" id="carDetail">
+            <div data-role="header" >
+                <a href="#mainpage" id="back" class="ui-btn-left" data-icon="arrow-l" data-direction="reverse">Back</a> 
+                <h1 id="carHeader"></h1>
+            </div>
+        
+            <div data-role="content">   
+                <ul data-role="listview" data-theme="d" data-inset="true">
+                    <li>
+                        <div class="ui-grid-a">
+                            <div class="ui-block-a">Brand</div>
+                            <div class="ui-block-b" id="brandDiv"></div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="ui-grid-a">
+                            <div class="ui-block-a">VIN</div>
+                            <div class="ui-block-b" id="vinDiv"></div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="ui-grid-a">
+                            <div class="ui-block-a">Mileage</div>
+                            <div class="ui-block-b" id="mileDiv"></div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="ui-grid-a">
+                            <div class="ui-block-a">Price</div>
+                            <div class="ui-block-b" id="priceDiv"></div>
+                        </div>
+                    </li>
+                </ul>      
+            </div>
+        
+            <div data-role="footer">
+                <div data-role="navbar">
+                    <ul>
+                        <li><a href="b.html">Financing</a></li>
+                        <li><a href="a.html">Previous Sales</a></li>
+                        <li><a href="b.html">Maintainance</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+</apex:page>

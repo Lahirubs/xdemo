@@ -1,0 +1,111 @@
+<apex:page controller="ManageInventoryController" tabStyle="Store__c">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/themes/ui-lightness/jquery-ui.css" type="text/css"/>
+    
+    <script type="text/javascript">
+        var j$ = jQuery.noConflict();
+        
+        j$(document).ready(function(){
+            makeDraggable();
+        });
+        
+        function makeDraggable(){
+            j$(".car").draggable({
+                revert: 'invalid'
+            });
+            
+            j$(".dropArea").droppable({
+                drop: function(event, ui){
+                    updateCar(   ui.draggable.attr('data-carId')   ,   j$(this).attr('data-storeId'));
+                } 
+            });
+        }
+    </script>
+    
+    <apex:form >
+        <apex:actionFunction name="updateCar" action="{!updateCar}" reRender="allStores" oncomplete="makeDraggable();" >
+            <apex:param name="carId" value=""/>
+            <apex:param name="storeId" value=""/>
+        </apex:actionFunction>
+    </apex:form>  
+          
+    <apex:sectionHeader title="Invetory Management"/>
+    
+    <apex:outputPanel id="allStores">
+        <apex:repeat value="{!stores}" var="s">
+            <div class="storeWrapper">
+                <apex:pageBlock title="{!s.name}" mode="edit"  >
+                    <apex:facet name="header">
+                        <div class="storeTitle">{!s.name}</div>
+                    </apex:facet>
+                    
+                    <div class="dropArea" data-storeId="{!s.Id}">
+                    
+                        <!-- List all of the cars located at this store -->
+                        <apex:repeat value="{!s.cars__r}" var="c">
+                            <div class="car" data-carId="{!c.Id}">
+                                <img title="Car" class="carLogo" alt="Car" src="/s.gif"/>
+                                <div>{!c.Brand__c} - {!c.Model__c}</div>
+                                <div><span>VIN: </span>{!c.VIN__c}</div>
+                            </div>
+                        </apex:repeat>
+                        
+                        <div class="clear"/>       
+                    </div>
+    
+                    <div class="clear"/>
+                </apex:pageBlock>
+            </div>
+        </apex:repeat>
+    </apex:outputPanel>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <style>
+        .car{
+            background-color: white;
+            border: 1px solid black;
+            border-radius: 5px;
+            float:left;
+            margin: 0px 0px 5px 5px;
+            padding: 3px;
+            width: 93%;
+        }
+        .clear{
+            clear: both;
+        }
+        .carLogo{
+            background-image: url("/img/icon/car32.png");
+            background-position: 0 0;
+            
+            display: inline;
+            float: left;
+            height: 32px;
+            width: 32px;
+        }
+        .dropArea{
+            min-height: 50px;
+        }
+        .storeWrapper{
+            float: left;
+            padding: 5px;
+            width: 300px;
+        }
+        .storeTitle{
+            font-size: 16px;
+            padding: 5px;
+            font-weight: bold;
+        } 
+    </style>
+    
+</apex:page>

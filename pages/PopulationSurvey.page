@@ -1,0 +1,49 @@
+<apex:page showHeader="false" standardController="DFSurvey__c" extensions="PopulationController">
+<script>
+function updateResults() {
+    if(!flashObject.updateData) {return;}
+    console.log("updating");
+    PopulationController.getSurveyResults(function(results,met) {
+        flashObject.updateData(results)
+        })
+}
+
+</script>
+<apex:form >
+<h1>Quick Survey:</h1>
+<table>
+    <tr><td>How many years has your company used Salesforce?</td>
+        <td><apex:inputField value="{!DFSurvey__c.Years_Using_Salesforce__c}" /></td>
+    </tr>
+    
+    <tr><td>How many years has your company sent employees to Dreamforce?</td>
+        <td><apex:inputField value="{!DFSurvey__c.Years_At_Dreamforce__c}" /></td>
+    </tr>
+
+    <tr><td>How many years has your company used Apex?</td>
+        <td><apex:inputField value="{!DFSurvey__c.Years_Using_Apex__c}" /></td>
+    </tr>
+
+    <tr><td>How many years has your company used Visualforce?</td>
+        <td><apex:inputField value="{!DFSurvey__c.Years_Using_Visualforce__c}" /></td>
+    </tr>
+
+    <tr><td>How many years has your company used Flex?</td>
+        <td><apex:inputField value="{!DFSurvey__c.Years_Using_Flex__c}" /></td>
+    </tr>
+    <tr><td></td>
+    <td><apex:commandButton oncomplete="updateResults()"
+    action="{!quicksave}" value="Save" reRender="saved" />
+    
+    </td>
+    </tr>
+</table>
+<apex:outputPanel id="saved"></apex:outputPanel>
+</apex:form>
+<button onclick="updateResults()" class="btn">Refresh Chart</button>
+<hr />
+
+<apex:flash height="340" width="800" src="{!URLFOR($Resource.PopulationFlex, 'PopulationDemo.swf')}" />
+
+
+</apex:page>

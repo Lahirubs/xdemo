@@ -1,0 +1,187 @@
+<apex:page controller="BlogController">
+    <!-- id=foo -->
+        <script language="javascript" type="text/javascript" src="{!URLFOR($Resource.jqPlot,'jquery.min.js')}"></script>
+        <script language="javascript" type="text/javascript" src="{!URLFOR($Resource.jQuery,'js/jquery-ui-1.8.11.custom.min.js')}"></script>
+        <script language="javascript" type="text/javascript" src="{!URLFOR($Resource.jqPlot,'jquery.jqplot.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.jqPlot,'plugins/jqplot.barRenderer.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.jqPlot,'plugins/jqplot.categoryAxisRenderer.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.jqPlot,'plugins/jqplot.pointLabels.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.jqPlot,'plugins/jqplot.pieRenderer.min.js')}"></script>   
+        <script type="text/javascript" src="{!$Resource.jQote2}"></script>
+        
+        <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.jqPlot,'jquery.jqplot.css')}" />
+        <link href="{!URLFOR($Resource.jQuery,'css/ui-lightness/jquery-ui-1.8.11.custom.css')}" rel="stylesheet" type="text/css"/>
+        <style>
+                #blogslist a { text-decoration: none; }
+        </style>
+        <script>
+        j$ = jQuery.noConflict();    
+        j$(document).ready(function(){
+            getChartData();
+        });   
+            
+        function getFilteredResults(filter,data) {
+            console.log(filter);
+            console.log(data);
+            
+            BlogController.getFilteredBlogPosts(filter,data,'{!beginDay}','{!endDay}', {!filterCommunity}, function(results,message) {
+                    console.log(data);
+                    j$('#blogstable').jqotesub('#blogsTmpl', results);
+                    j$('#blogslist').dialog({ title: 'Blogs by '+filter+': '+data, minWidth: 500 });
+                    j$('#blogslist a').blur();
+                });
+            }
+        
+            
+        function getChartData() {
+         var data = [{!authorData}];
+            var labelString = "{!authorLabels}";
+            var authorlabels = labelString.split("|");
+            
+            var s1 = [];
+            for(x = 0; x < authorlabels.length; x++) {
+                s1.push([authorlabels[x],data[x]]);
+            }
+            var authorchart = j$.jqplot('authorchart',[s1],{
+                title: 'Blogs By Author',
+                series:[{renderer:j$.jqplot.BarRenderer}],
+                axesDefaults: {
+                tickRenderer: j$.jqplot.CanvasAxisTickRenderer ,
+                tickOptions: {
+                      fontFamily: 'Georgia',
+                      fontSize: '10pt',
+                      angle: -30
+                    }
+                },
+                axes: {
+                  xaxis: {
+                    renderer: j$.jqplot.CategoryAxisRenderer,
+                  }
+                }
+                 });
+            
+            j$('#authorchart').bind('jqplotDataClick', 
+            function (ev, seriesIndex, pointIndex, data) {
+                    getFilteredResults('author',authorlabels[data[0]-1]);
+                    }
+            );
+
+            data = [{!catData}];
+            labelString = "{!catLabels}";
+            labels = labelString.split("|");
+            
+            s1 = [];
+            for(x = 0; x < labels.length; x++) {
+                s1.push([labels[x],data[x]]);
+            }
+            var categorychart = j$.jqplot('categorychart',[s1],
+            {
+                title: 'Blogs By Category',
+                seriesDefaults: {
+                renderer: j$.jqplot.PieRenderer, 
+                rendererOptions: {
+                  // Turn off filling of slices.
+                  fill: false,
+                  showDataLabels: true, 
+                  // Add a margin to seperate the slices.
+                  sliceMargin: 4, 
+                  // stroke the slices with a little thicker line.
+                  lineWidth: 5
+                }
+              }, 
+              legend: { show:true, location: 'e' }
+            }
+          );
+
+        j$('#categorychart').bind('jqplotDataClick', 
+            function (ev, seriesIndex, pointIndex, data) {
+                    getFilteredResults('category',data[0]);
+                    }
+            );
+
+            var daysOfWeek = "{!daysOfWeek}";
+            daysOfWeek = daysOfWeek.split(",");
+            var dateData = [{!dateData}];
+            var dateLabels = "{!dateLabels}";
+            dateLabels = dateLabels.split("|");
+            var d1 = [];
+            var count = 0;
+            var highestCount = 0;
+            for(var x = 0; x < dateLabels.length; x++) {
+              count += dateData[x];
+              if(daysOfWeek[x] == "Friday") {
+                d1.push(["Week Ending "+dateLabels[x],count]);
+                if(count > highestCount) { highestCount = count; }
+                count = 0;
+              }  
+            }
+
+            var calendarchart = j$.jqplot('calendarchart',[d1],{ 
+                title: 'Blogs By Week',
+//series:[{renderer:j$.jqplot.BarRenderer}],
+                axesDefaults: {
+                pad: 0,
+                tickRenderer: j$.jqplot.CanvasAxisTickRenderer ,
+                tickOptions: {
+                      fontFamily: 'Georgia',
+                      fontSize: '10pt',
+                      angle: -30
+                    }
+                },
+                axes: {
+                  yaxis:{min:0},
+                
+                  xaxis: {
+                    renderer: j$.jqplot.CategoryAxisRenderer
+                  }
+                }
+                 }); 
+
+            j$('#calendarchart').bind('jqplotDataClick', 
+                function (ev, seriesIndex, pointIndex, data) {
+                    console.log(data);
+                    getFilteredResults('calendar',d1[data[0]-1][0].split('Week Ending ')[1]);
+                    }
+            );
+        }
+        </script>
+        <div style="padding: 20px;">
+        <h1 style="font-size: 24pt;">{!blogCount} post(s) for {!beginDay} - {!endDay}</h1><br />
+            <h2 style="font-size: 18pt;">Tagged:</h2> <c:MetricCloud metrics="{!tags}" />
+	<apex:form >
+            <apex:inputCheckbox value="{!filterCommunity}" >
+                <apex:actionSupport event="onclick" action="{!refresh}" oncomplete="getChartData()" />
+            </apex:inputCheckbox>
+            Filter Community
+        </apex:form>
+        <br />
+	<div id="calendarchart"></div>
+        <!--
+        <img src="https://chart.googleapis.com/chart?chxt=x,y&chxr=1,1,5,1&chs=900x250&chds=a&cht=lc&chd=t:{!dateData}&chl={!dateLabels}" />
+	-->
+        <br />
+	<div id='authorchart'></div>
+        <!-- old chart
+            <img src="https://chart.googleapis.com/chart?chxt=x,y&chxr=0,1,10,1&chs=650x450&chds=a&cht=bhs&chd=t:{!authorData}&chxt=x,y&chxl=1:|{!authorLabels}" />
+	-->
+        <br />
+        <div id='categorychart'></div>
+        <!--
+        <img src="https://chart.googleapis.com/chart?chxt=x,y&chs=790x250&chds=a&cht=p&chd=t:{!catData}&chl={!catLabels}" />
+	-->
+        </div>
+
+<!-- Blog_Entry -->
+<div id='blogslist' style='display: none;'>
+    <div id="blogstable" style='width: 450px; background-color: white; border: 1px solid black; border-top: none; margin: 0px; padding: 5px;'></div>
+</div>
+
+<script type="text/x-jqote-template" id="blogsTmpl">
+    <div style="border-bottom: 1px dash #ccc; margin-bottom: 10px;">
+        <h4><a href="/<%= this.Id %>" target="_new"><%= this.Title__c %></a>&nbsp;<a href="<%= this.Link__c %>" target="_new">#</a></h4>
+        <br clear="all" />
+        <%= this.Author__c %>, <%= new Date(this.Published__c).toLocaleDateString() %>
+    </div>
+</script>
+
+</apex:page>

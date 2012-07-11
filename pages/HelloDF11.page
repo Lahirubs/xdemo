@@ -1,0 +1,10 @@
+<apex:page >
+<!--  
+<apex:composition template="HelloDF11Template">
+<apex:define name="body"> -->
+<h1>Congratulations</h1>
+This is your new Page
+<!-- 
+</apex:define>
+</apex:composition> -->
+</apex:page>

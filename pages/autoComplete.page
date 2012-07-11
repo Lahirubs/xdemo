@@ -1,0 +1,44 @@
+<apex:page controller="AutoCompleteController" id="page">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.14/themes/ui-lightness/jquery-ui.css" type="text/css"/>
+    
+    <apex:form id="form" >
+        <apex:inputText value="{!brand}" id="brandTextField"/>
+        <apex:inputField value="{!car.Brand__c}" id="brandInputField"/>
+    </apex:form>
+    
+    <script>
+    
+        var j$ = jQuery.noConflict();
+        var $inputfield;
+        
+        j$(document).ready(function(){
+            $inputField = j$("select[id$='brandInputField']");
+            
+            j$("input[id$='brandTextField']").autocomplete({
+                source: getValues(),
+                select: function(event,ui){
+                    $inputField.val(ui.item.value);
+                }
+            });
+            
+            j$("input[id$='brandTextField']").bind('keyup change blur',function(){
+                if(j$(this).val() == ''){
+                    $inputField.val('');
+                }
+            });
+        
+        });
+        
+        function getValues(){
+            var picklistValues = [];
+            
+            $inputField.children().each(function(index){
+                picklistValues[index] = j$(this).text();
+            });   
+            
+            return picklistValues;    
+        }
+    </script>
+</apex:page>

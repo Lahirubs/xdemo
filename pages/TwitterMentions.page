@@ -1,0 +1,3 @@
+<apex:page standardController="Blog_Entry__c" showheader="false">
+    <script>window.location.href = 'http://twitter.com/#!/search/realtime/{!URLENCODE(Blog_Entry__c.Link__c)}'</script>   
+</apex:page>

@@ -1,0 +1,6 @@
+<apex:component controller="MetricCloudController">
+	<apex:attribute name="metrics" type="BlogMetric[]" assignTo="{!metrics}" required="true" description="List of blog metrics" />
+	<apex:repeat value="{!metrics}" var="tag">
+            &nbsp;<a href="#" onmousedown="getFilteredResults('tag','{!tag.label}')"><span style="font-size: 1{!tag.value}px; font-weight: bold" >{!tag.label}</span></a>
+	</apex:repeat>
+</apex:component>

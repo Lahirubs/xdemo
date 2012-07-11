@@ -1,0 +1,77 @@
+<apex:page controller="BlogURLHandler">
+<script src="http://code.jquery.com/jquery-1.6.3.min.js"></script>
+<script>
+    j$ = jQuery.noConflict();
+    var bindex = 0;
+    function loadInfo() {
+    	clear();
+    	j$("input[id$='blogTitle']").val(j$('.entry-title a').eq(bindex).html());
+    	j$("input[id$='blogAuthor']").val(j$('.author a').eq(bindex).html());
+    	j$("input[id$='blogLink']").val(j$("input[id$='myURL']").val());
+    	j$("textarea[id$='blogLeadCopy']").val(j$(".entry-content").eq(bindex).html());
+    	
+    	j$(".tag-links").eq(bindex).children("a").each(function(index) {
+    		newtag = j$("textarea[id$='blogTags']").val() + "|" + j$(this).html();
+    		console.log(newtag);
+    		j$("textarea[id$='blogTags']").val( newtag );		
+    		});
+    	BlogURLHandler.getPublishDate(j$('.entry-date abbr').eq(bindex).html(),function(data,mes) { j$("input[id$='blogPublish']").val(data); });
+    }
+    
+    function prev() { bindex--; loadInfo(); }
+    function next() { bindex++; loadInfo(); }
+	function clear() {
+		j$("input[id$='blogTitle']").val("");
+		j$("input[id$='blogAuthor']").val("");
+		j$("input[id$='blogLink']").val("");
+		j$("input[id$='blogPublish']").val("");
+		j$("textarea[id$='blogTags']").val("");
+	}
+</script>
+<button onmousedown="loadInfo();">Load</button>
+<button onmousedown="prev()">&laquo;</button><button onmousedown="next()">&raquo;</button>
+<apex:outputPanel id="output">
+<apex:form >
+  <apex:inputText id="myURL" value="{!url}" style="width:400px" />
+  <apex:commandButton action="{!getURL}" reRender="output" value="Get URL" oncomplete="loadInfo()" />
+  <apex:outputText value="{!status}" />
+  
+  <apex:pageblock Title="Blog Entry Data">
+  <apex:inputHidden id="blogId" value="{!blog.id}" />
+  <apex:pageBlockButtons >
+                <apex:commandButton action="{!saveBlog}" reRender="output" value="Save Blog" />
+  </apex:pageBlockButtons>
+            
+  
+  <apex:pageBlockSection title="Blog Post" columns="2">
+  	<apex:inputField id="blogTitle" value="{!blog.Title__c}" style="width:300px" />
+  	<apex:inputField id="blogAuthor" value="{!blog.Author__c}" />
+  	<apex:inputField id="blogLink" value="{!blog.Link__c}" /> 
+  	<apex:inputField id="blogPublish" value="{!blog.Published__c}" />
+  	<apex:inputField id="blogLeadCopy" value="{!blog.Lead_Copy__c}" style="width:300px" />
+  </apex:pageBlockSection>
+  
+  <apex:pageBlockSection title="Tags/Meta" columns="2">
+  	
+  	<apex:inputField id="blogCategory" value="{!blog.Category__c}" />
+  	<apex:inputField id="blogTag1" value="{!blog.Tag_1__c}" />
+  	<apex:inputField id="blogTag2" value="{!blog.Tag_2__c}" /> 
+  	<apex:inputField id="blogTag3" value="{!blog.Tag_3__c}" />
+  	<apex:inputField id="blogTag4" value="{!blog.Tag_3__c}" />
+  	<apex:inputField id="blogTags" value="{!blog.Blog_Tags__c}" />
+  	
+  </apex:pageBlockSection>
+  </apex:pageblock>
+</apex:form>  
+
+  <HR />
+  <h3>Preview:</h3>
+  <div style="border: solid 1px black; width: 80%;">
+  
+  	<div style="height: 300px; overflow: auto;"><apex:outputText escape="false" value="{!html}" /></div>
+  
+  </div>
+
+</apex:outputPanel> 
+ 
+</apex:page>
